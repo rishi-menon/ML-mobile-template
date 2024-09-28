@@ -51,9 +51,6 @@ import kotlin.math.pow
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-const val RNG_SNACKBAR_ERROR_MESSAGE = "Please enter a valid integer!"
-const val VECTOR_SNACKBAR_ERROR_MESSAGE = "Please enter a valid 3D vector!"
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

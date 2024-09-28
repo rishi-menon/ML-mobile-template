@@ -32,12 +32,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.imashnake.aiels.RNG_SNACKBAR_ERROR_MESSAGE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.pow
 import kotlin.random.Random
 import kotlin.random.nextInt
+
+const val RNG_SNACKBAR_ERROR_MESSAGE = "Please enter a valid integer!"
 
 @Composable
 fun NumberGenerator(modifier: Modifier = Modifier) {

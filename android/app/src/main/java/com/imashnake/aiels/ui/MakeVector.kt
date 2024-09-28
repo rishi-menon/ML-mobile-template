@@ -27,10 +27,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.imashnake.aiels.VECTOR_SNACKBAR_ERROR_MESSAGE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+const val VECTOR_SNACKBAR_ERROR_MESSAGE = "Please enter valid components!"
 
 @Composable
 fun MakeVector(
