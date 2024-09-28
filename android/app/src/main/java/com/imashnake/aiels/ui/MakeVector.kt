@@ -150,7 +150,7 @@ private fun show3DVector(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     keyboardController: SoftwareKeyboardController?,
-    delay: Long = 500L,
+    delay: Long = 750L,
     onDismiss: suspend (delay: Long) -> Unit
 ) {
 //    // Show or hide keyboard
