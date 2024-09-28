@@ -59,7 +59,7 @@ fun MakeVector(
                 label = { Text("Component 1") },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
+                    imeAction = if (component1.text.isEmpty()) ImeAction.Previous else ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = { focusManager.moveFocus(FocusDirection.Down) }
@@ -71,10 +71,11 @@ fun MakeVector(
                 label = { Text("Component 2") },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
+                    imeAction = if (component2.text.isEmpty()) ImeAction.Previous else ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { focusManager.moveFocus(FocusDirection.Down) }
+                    onDone = { focusManager.moveFocus(FocusDirection.Down) },
+                    onPrevious = { focusManager.moveFocus(FocusDirection.Up) }
                 )
             )
             TextField(
@@ -83,7 +84,7 @@ fun MakeVector(
                 label = { Text("Component 3") },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
+                    imeAction = if (component3.text.isEmpty()) ImeAction.Previous else ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
