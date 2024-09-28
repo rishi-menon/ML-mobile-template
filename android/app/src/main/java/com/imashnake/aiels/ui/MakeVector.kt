@@ -87,7 +87,7 @@ fun MakeVector(
                     imeAction = if (component3.text.isEmpty()) ImeAction.Previous else ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = {
+                    onDone = {
                         show3DVector(
                             Triple(component1, component2, component3).takeIf {
                                 it.toList().all { component ->
@@ -106,7 +106,8 @@ fun MakeVector(
                                 vector = "($first, $second, $third)"
                             }
                         }
-                    }
+                    },
+                    onPrevious = { focusManager.moveFocus(FocusDirection.Up) }
                 )
             )
         }
