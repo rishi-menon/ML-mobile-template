@@ -13,6 +13,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import org.tensorflow.lite.support.tensorbuffer.TensorBufferFloat
 import java.nio.FloatBuffer
 
+typealias Vector = Triple<Float, Float, Float>
+
 private const val TAG = "Interpreter"
 
 /**
@@ -45,14 +47,15 @@ class AielsInterpreter(
         }
     }
 
+    /** Called in the VM */
     suspend fun runModel(
-        vector: FloatArray
+        vector: Vector
     ) = withContext(Dispatchers.IO) {
         if (interpreter == null) return@withContext
 
         val shape = interpreter?.getInputTensor(0)?.shape() ?: return@withContext
         val tensorBufferFloat = TensorBufferFloat.createFixedSize(shape, DataType.FLOAT32)
-        tensorBufferFloat.loadArray(vector)
+        tensorBufferFloat.loadArray(vector.toFloatArray())
         val output = runModelWithTFLite(tensorBufferFloat)
 
         _scaleAndSum.emit(output.firstOrNull() ?: Float.NaN)
@@ -74,3 +77,5 @@ class AielsInterpreter(
         return output
     }
 }
+
+fun Vector.toFloatArray() = floatArrayOf(first, second, third)
