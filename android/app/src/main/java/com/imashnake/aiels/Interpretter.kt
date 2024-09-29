@@ -3,7 +3,6 @@ package com.imashnake.aiels
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
@@ -48,16 +47,15 @@ class AielsInterpreter(
 
     suspend fun runModel(
         vector: FloatArray
-    ): Any = withContext(Dispatchers.IO) {
+    ) = withContext(Dispatchers.IO) {
         if (interpreter == null) return@withContext
+
         val shape = interpreter?.getInputTensor(0)?.shape() ?: return@withContext
         val tensorBufferFloat = TensorBufferFloat.createFixedSize(shape, DataType.FLOAT32)
         tensorBufferFloat.loadArray(vector)
-
         val output = runModelWithTFLite(tensorBufferFloat)
-        output.forEach {
-            Log.d(TAG, "runModel: $it")
-        }
+
+        _scaleAndSum.emit(output.firstOrNull() ?: Float.NaN)
     }
 
     private fun runModelWithTFLite(

@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
         )
 
         lifecycleScope.launch {
-            interpreter.runModel(floatArrayOf(5f, 5f, 5f))
+            interpreter.runModel(floatArrayOf(1f, 2f, 3f))
         }
     }
 }
