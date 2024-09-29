@@ -7,8 +7,12 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import org.tensorflow.lite.support.tensorbuffer.TensorBufferFloat
+import java.nio.FloatBuffer
 
 private const val TAG = "Interpreter"
 
@@ -33,7 +37,7 @@ class AielsInterpreter(
     /** Init a Interpreter from the tflite asset */
     private fun initAielsInterpreter() {
         interpreter = try {
-            val litertBuffer = FileUtil.loadMappedFile(context, "$fileName.tflite")
+            val litertBuffer = FileUtil.loadMappedFile(context, "model.tflite")
             Log.i(TAG, "Created TFLite buffer from asset")
             Interpreter(litertBuffer, Interpreter.Options())
         } catch (e: Exception) {
@@ -43,11 +47,32 @@ class AielsInterpreter(
     }
 
     suspend fun runModel(
-        vector: Triple<Float, Float, Float>
-    ) = withContext(Dispatchers.IO) {
+        vector: FloatArray
+    ): Any = withContext(Dispatchers.IO) {
         if (interpreter == null) return@withContext
+        val shape = interpreter?.getInputTensor(0)?.shape() ?: return@withContext
+        val tensorBufferFloat = TensorBufferFloat.createFixedSize(shape, DataType.FLOAT32)
+        tensorBufferFloat.loadArray(vector)
 
-        val scaleAndSum = vector.toList().sum() * 2
-        _scaleAndSum.emit(scaleAndSum)
+        val output = runModelWithTFLite(tensorBufferFloat)
+        output.forEach {
+            Log.d(TAG, "runModel: $it")
+        }
+    }
+
+    private fun runModelWithTFLite(
+        tensorBuffer: TensorBuffer
+    ): FloatArray {
+        val outputShape = interpreter!!.getOutputTensor(0)!!.shape()
+        val outputBuffer = FloatBuffer.allocate(outputShape[0])
+        val inputBuffer = TensorBuffer.createFrom(tensorBuffer, DataType.FLOAT32).buffer
+
+        inputBuffer.rewind()
+        outputBuffer.rewind()
+        interpreter?.run(inputBuffer, outputBuffer)
+        outputBuffer.rewind()
+        val output = FloatArray(outputBuffer.capacity())
+        outputBuffer.get(output)
+        return output
     }
 }

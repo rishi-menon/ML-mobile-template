@@ -41,6 +41,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.imashnake.aiels.ui.AielsSnackbar
 import com.imashnake.aiels.ui.MakeVector
 import com.imashnake.aiels.ui.theme.AielsTheme
@@ -59,6 +60,15 @@ class MainActivity : ComponentActivity() {
             AielsTheme {
                 MainScreen()
             }
+        }
+
+        val interpreter = AielsInterpreter(
+            fileName = "model",
+            context = this
+        )
+
+        lifecycleScope.launch {
+            interpreter.runModel(floatArrayOf(5f, 5f, 5f))
         }
     }
 }
