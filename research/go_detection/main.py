@@ -1,28 +1,33 @@
-import debugpy
+import logging
 import os
-import hydra
-from hydra.core.config_store import ConfigStore
 import sys
-
+from datetime import datetime
 from typing import List, Optional
-from omegaconf import OmegaConf
-from config import SimCfg
+
+import debugpy
+import hydra
 from common.asset_io import AssetIO
+from config import SimCfg
 from go_detection.common.git_utils import get_git_info
+from hydra.core.config_store import ConfigStore
+from hydra.core.hydra_config import HydraConfig
+from omegaconf import OmegaConf
+
+logger = logging.getLogger(__name__)
 
 
 def do_main(cfg: SimCfg):
-    a = 1
+    logger.info("Start")
 
 
 @hydra.main(config_path="config", config_name="basic", version_base="1.2")
 def main(cfg: SimCfg):
-    cfg_yaml = OmegaConf.to_yaml(cfg)
-    print(cfg_yaml)
+    OmegaConf.set_readonly(cfg, True)
 
     # Save config info
-    exp_io = AssetIO(os.path.join(cfg.exp_dir, cfg.exp_name))
+    exp_io = AssetIO(os.path.join(cfg.result_cfg.dir, cfg.result_cfg.exp_name))
     exp_io.mkdir(".")
+    exp_io.mkdir("log")
     exp_io.save_yaml("config.yaml", cfg)
 
     # Save git infomation
@@ -39,6 +44,23 @@ def main(cfg: SimCfg):
             "export_command": export_cmd,
         },
     )
+
+    # Setup file logger manually (after the log folder is created)
+    # Add cli arg hydra.job_logging.root.level=ERROR to set log level
+    str_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    log_file = f"{cfg.result_cfg.dir}/{cfg.result_cfg.exp_name}/log/{str_now}.log"
+    fh = logging.FileHandler(filename=log_file)
+    fh.setFormatter(
+        logging.Formatter(fmt="[%(asctime)s][%(name)s][%(levelname)s] - %(message)s")
+    )
+    logging.getLogger().addHandler(fh)
+
+    # Print config
+    cfg_yaml = OmegaConf.to_yaml(cfg)
+    logger.info("Config:\n%s", cfg_yaml)
+
+    logger.info("Hydra dir set to: %s", HydraConfig.get().run.dir)
+    logger.info(f"Log level set to: {HydraConfig.get().job_logging.root.level}")
 
     if os.environ.get("ENABLE_DEBUGPY"):
         print("")
