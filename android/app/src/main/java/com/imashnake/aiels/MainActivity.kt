@@ -14,14 +14,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
 import com.imashnake.aiels.ui.AielsSnackbar
 import com.imashnake.aiels.ui.MakeVector
 import com.imashnake.aiels.ui.theme.AielsTheme
-import kotlinx.coroutines.launch
+import org.koin.androidx.compose.KoinAndroidContext
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,24 +31,21 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AielsTheme {
-                MainScreen()
+                KoinAndroidContext {
+                    MainScreen()
+                }
             }
-        }
-
-        val interpreter = AielsInterpreter(
-            fileName = "model",
-            context = this
-        )
-
-        lifecycleScope.launch {
-            interpreter.runModel(Vector(1f, 2f, 3f))
         }
     }
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = koinViewModel(),
+) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val result by viewModel.result.collectAsState(Float.NaN)
 
     Scaffold(
         snackbarHost = {
@@ -55,16 +54,22 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 snackbar = { AielsSnackbar(it) },
                 modifier = Modifier.imePadding(),
             )
-        }
+        },
+        modifier = modifier,
     ) { contentPadding ->
         Box(
             contentAlignment = Alignment.Center,
-            modifier = modifier
+            modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
         ) {
-            MakeVector(snackbarHostState, modifier)
+            MakeVector(
+                result = result,
+                snackbarHostState = snackbarHostState,
+                onRequestResult = { viewModel.runModel(it) },
+                modifier = Modifier,
+            )
         }
     }
 }

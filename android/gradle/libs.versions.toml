@@ -33,7 +33,7 @@ litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "
 litert-support-api = { group = "com.google.ai.edge.litert", name = "litert-support-api", version.ref = "litert" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
-koin-android = { module = "io.insert-koin:koin-android" }
+koin-android = { module = "io.insert-koin:koin-androidx-compose" }
 
 [plugins]
 

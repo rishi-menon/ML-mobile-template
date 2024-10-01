@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.imashnake.aiels.Vector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -35,7 +36,9 @@ const val VECTOR_SNACKBAR_ERROR_MESSAGE = "Please enter valid components!"
 
 @Composable
 fun MakeVector(
+    result: Float,
     snackbarHostState: SnackbarHostState,
+    onRequestResult: (vector: Vector) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -50,8 +53,6 @@ fun MakeVector(
         var component1 by remember { mutableStateOf(TextFieldValue("")) }
         var component2 by remember { mutableStateOf(TextFieldValue("")) }
         var component3 by remember { mutableStateOf(TextFieldValue("")) }
-
-        var vector by remember { mutableStateOf("") }
 
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             TextField(
@@ -92,7 +93,7 @@ fun MakeVector(
                         show3DVector(
                             Triple(component1, component2, component3).takeIf {
                                 it.toList().all { component ->
-                                    component.text.toIntOrNull() != null
+                                    component.text.toFloatOrNull() != null
                                 }
                             }?.run { "Generated 3D vector!" } ?: VECTOR_SNACKBAR_ERROR_MESSAGE,
                             scope,
@@ -101,10 +102,10 @@ fun MakeVector(
                         ) {
                             Triple(component1.text, component2.text, component3.text).takeIf {
                                 it.toList().all { component ->
-                                    component.toIntOrNull() != null
+                                    component.toFloatOrNull() != null
                                 }
                             }?.run {
-                                vector = "($first, $second, $third)"
+                                onRequestResult(Vector(first.toFloat(), second.toFloat(), third.toFloat()))
                             }
                         }
                     },
@@ -127,10 +128,10 @@ fun MakeVector(
                 ) {
                     Triple(component1.text, component2.text, component3.text).takeIf {
                         it.toList().all { component ->
-                            component.toIntOrNull() != null
+                            component.toFloatOrNull() != null
                         }
                     }?.run {
-                        vector = "($first, $second, $third)"
+                        onRequestResult(Vector(first.toFloat(), second.toFloat(), third.toFloat()))
                     }
                 }
             }
@@ -140,8 +141,8 @@ fun MakeVector(
 
         Spacer(Modifier.size(30.dp))
 
-        AnimatedContent(vector, label = "vector_anim") { v ->
-            Text(text = v)
+        AnimatedContent(result, label = "vector_anim") {
+            Text(text = it.toString())
         }
     }
 }
