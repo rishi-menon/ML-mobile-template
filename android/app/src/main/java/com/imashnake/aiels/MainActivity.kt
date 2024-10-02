@@ -20,7 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.imashnake.aiels.ui.AielsSnackbar
-import com.imashnake.aiels.ui.MakeVector
+import com.imashnake.aiels.ui.ProcessVectorScreen
 import com.imashnake.aiels.ui.theme.AielsTheme
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
@@ -62,13 +62,13 @@ fun MainScreen(
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(MaterialTheme.colorScheme.background)
+                .imePadding(),
         ) {
-            MakeVector(
-                result = result,
+            ProcessVectorScreen(
                 snackbarHostState = snackbarHostState,
                 onRequestResult = { viewModel.runModel(it) },
-                modifier = Modifier,
+                result = result
             )
         }
     }

@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 
 const val VECTOR_SNACKBAR_ERROR_MESSAGE = "Please enter valid components!"
 
+@Deprecated("Replace with ProcessVector")
 @Composable
 fun MakeVector(
     result: Float,
